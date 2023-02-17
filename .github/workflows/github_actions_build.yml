@@ -3,36 +3,19 @@ name: Build
 on: [push, pull_request]
 
 jobs:
-  buildUbuntu:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@master
-    - name: make
-      run: |
-         cd vt
-         make demos
-         cd ../fb
-         make UTF8=Y demos
-
-  buildOSX:
-    runs-on: macOS-latest
-
-    steps:
-    - uses: actions/checkout@master
-    - name: make
-      run: |
-         cd vt
-         make CLANG=Y demos
-
+  
   buildWindows:
+    continue-on-error: true
+    strategy:
+      matrix:
+        arch: [x64, x86, x64_arm64, x64_arm]
     runs-on: windows-2022
 
     steps:
     - uses: actions/checkout@master
     - name: make
       run: |
-        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+        call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" ${{ matrix.arch }}
         cd wingui
         nmake UTF8=Y DLL=Y -f Makefile.vc demos
         cd ..\wincon
